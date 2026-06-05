@@ -1,0 +1,171 @@
+GRIDx <-> PrismVend API Calls Reference
+=========================================
+Based on PrismVend Web Vending API (PR-D2-1112 rev 5.22.2)
+All requests use: Content-Type: application/x-www-form-urlencoded
+All responses are INI format (key=value pairs)
+No authentication required (network-secured API)
+
+=========================================
+1. REGISTER A METER
+=========================================
+POST http://{HOST}:{PORT}/stsvend/Meter/{DRN}.ini
+
+Body:
+  docId=new
+  sgc=999907
+  krn=2
+  ti=1
+  ea=7
+  tct=2
+  resType=0
+  name=Customer+Name
+  organisation=Pulsar+Namibia
+
+Response:
+  drn=0260060135803
+  sgc=999907
+  krn=2
+  ti=1
+  ea=7
+  tct=2
+  resType=0
+  name=Customer Name
+  organisation=Pulsar Namibia
+  isRegistered=1
+  meterPan=002600601358030
+  idRecord=00260060135803090000020799070211
+  docId=abc123
+
+=========================================
+2. GENERATE CREDIT TOKEN (VEND)
+=========================================
+POST http://{HOST}:{PORT}/stsvend/VendCredit2.ini
+
+Body:
+  meterId=0260060135803
+  subclass=0          (0=electricity, 1=water, -1=auto)
+  value=10000         (in cents: N$100 = 10000)
+  messageId=GRIDx-1780648350595
+
+Response:
+  idRecord=00260060135803090000020799070211
+  tariff=2.45000
+  subclass=0
+  description=Sale - Credit:Electricity
+  vendTimeUnix=1780648351
+  unitsActual=408
+  unitName=hWh
+  valueActual=10001.00
+  numTokens=1
+  tokenDec_1=25090336776125269841
+  description_1=Sale - Credit:Electricity
+  tillslipSv=Payment|100.00|Credit:Electricity;40.8 kWh @ 2.45000|...
+
+=========================================
+3. ENGINEERING TOKEN
+=========================================
+POST http://{HOST}:{PORT}/stsvend/VendMse.ini
+
+Body:
+  meterId=0260060135803
+  subclass=1          (0=SetMaxPowerLimit, 1=ClearCredit, 5=ClearTamper, 6=MaxPhaseUnbalance)
+  supp=65535          (supplementary value, subclass-dependent)
+  messageId=GRIDx-1780648400000
+
+Response:
+  idRecord=00260060135803090000020799070211
+  subclass=1
+  description=Tech - ClearCredit
+  vendTimeUnix=1780648401
+  unitsActual=65535
+  unitName=regno
+  tokenDec=14789007108002346641
+  tokenHex=0CD3D1B9BF534F691
+
+=========================================
+4. ENGINEERING KEY CHANGE
+=========================================
+POST http://{HOST}:{PORT}/stsvend/EngineeringKeyChange.ini
+
+Body:
+  meterId=0260060135803
+  fromSgc=999907
+  fromKrn=2
+  fromTi=1
+  toSgc=999907
+  toKrn=2
+  toTi=1
+  messageId=GRIDx-1780648500000
+
+Response:
+  description=Key Change
+  vendTimeUnix=1780648501
+  fromIdRecord=00260060135803090000020799070211
+  toIdRecord=00260060135803090000020799070211
+  isRegistered=1
+  numTokens=2
+  tokenDec_1=12345678901234567890
+  description_1=Key Change Token 1
+  tokenDec_2=09876543210987654321
+  description_2=Key Change Token 2
+
+=========================================
+5. UPDATE METER KEY (KCT)
+=========================================
+POST http://{HOST}:{PORT}/stsvend/UpdateMeterKey.ini
+
+Body:
+  meterId=0260060135803
+  fromSgc=999907
+  fromKrn=2
+  fromTi=1
+  messageId=GRIDx-1780648600000
+
+Response: Same as EngineeringKeyChange
+Returns 204 if meter already matches system (no KCT needed)
+
+=========================================
+6. GET METER INFO
+=========================================
+GET http://{HOST}:{PORT}/stsvend/Meter/{DRN}.ini
+
+Response:
+  drn=0260060135803
+  sgc=999907
+  krn=2
+  ti=1
+  ea=7
+  tct=2
+  resType=0
+  name=Hasheela Kamati
+  organisation=Pulsar Namibia
+  isRegistered=1
+  balanceCf=0
+  meterPan=002600601358030
+  idRecord=00260060135803090000020799070211
+  queuedKct=
+  docId=abc123
+  channelFee=0.25
+  tariffRate=2.45
+
+=========================================
+7. TRANSACTION COUNTER (HEALTH CHECK)
+=========================================
+GET http://{HOST}:{PORT}/stsvend/QueryTx.ini
+
+Response:
+  txCredit=21000
+
+=========================================
+GRIDx METER DEFAULTS (from ESP32 firmware)
+=========================================
+Manufacturer Code: 0260
+SGC: 999907 (EM Default)
+KRN: 2
+TI: 1
+EA: 7
+TCT: 2
+BDT: 02 (Base Date 2014)
+KEN: 255
+Resource Type: 0 (Electricity)
+Default Key: FFFFFFFFFFFFFFFF (Initialization)

@@ -1,0 +1,53 @@
+PrismVend Setup Guide for GRIDx Integration
+=============================================
+
+WHAT YOU NEED
+=============
+1. PrismVend server IP address
+2. PrismVend API port (default: 8080)
+3. Network access from GRIDx server (157.230.106.54) to PrismVend
+
+WHAT TO ASK SCS / CITY OF WINDHOEK
+====================================
+- PrismVend server IP address and API port (default 8080)
+- Is the connection HTTP or HTTPS?
+- Whitelist GRIDx server IP 157.230.106.54 in firewall
+- Are vending keys for SGC 999907 (EM Default), KRN 2 loaded in TSM250?
+- Is tariff configured for SGC=999907, TI=1, Subclass=0 (Electricity)?
+- Transaction credits remaining on TSM250?
+
+CONNECTING GRIDx TO PRISMVEND
+==============================
+1. Go to https://gridx-meters.com/hsm
+2. Click "PrismVend Config" tab
+3. Enter Host IP and Port (8080)
+4. Click "Save Configuration"
+5. Click "Test Connection"
+6. If shows "Connected" with TX credits - ready to go
+
+REGISTERING METERS
+===================
+1. Go to "Meter Registration" tab
+2. Click "Load GRIDx Meters"
+3. Select meters to register
+4. Click "Register Selected"
+5. Each meter registered with: SGC=999907, KRN=2, TI=1, EA=7, TCT=2
+
+VENDING TOKENS
+===============
+1. Go to "Token Generation" tab
+2. Select "Credit Token (Electricity)"
+3. Enter meter DRN and amount in N$
+4. Click "Generate Credit Token"
+5. 20-digit STS token returned from PrismVend/TSM250
+
+CURRENT GRIDx METERS
+=====================
+DRN              Customer          Location
+0260060135803    Hasheela Kamati    Windhoek, Khomas
+0260060136363    Kamati Hasheela    Windhoek, Khomas
+0260066545456    Kamati Hasheela    Windhoek, Khomas
+0260066545641    Kamati Hasheela    Windhoek, Khomas
+0260152877924    Test12 Test12     Windhoek, Khomas
+
+All meters: SGC=999907, KRN=2, TI=1, EA=7, TCT=2
